@@ -70,15 +70,15 @@ fn main() {
 
     // and so on
 
-    const START_END_CHARACTER: char = '`';
     let mut all_characters: HashSet<char> = HashSet::from_iter(buf.chars());
-    all_characters.insert(START_END_CHARACTER);
     all_characters.remove(&'\n');
+    const START_END_CHARACTER: char = '`'; // next characters are lowercase alphabeth letters: a, b, c...
+    all_characters.insert(START_END_CHARACTER);
     let mut char_to_index = HashMap::new();
     let mut index_to_char = HashMap::new();
     for c in all_characters {
-        let index = (c as u8 - 96) as usize;
-        char_to_index.insert(c, (c as u8 - 96) as usize);
+        let index = (c as u8 - START_END_CHARACTER as u8) as usize;
+        char_to_index.insert(c, index);
         index_to_char.insert(index, c);
     }
 
@@ -98,7 +98,7 @@ fn main() {
         }
     }
 
-    let engram_distribution = engrams
+    let engram_distribution_model = engrams
         .iter()
         .map(|row| WeightedIndex::new(row).unwrap())
         .collect::<Vec<_>>();
@@ -107,7 +107,7 @@ fn main() {
     for _ in 0..100 {
         let mut character_index = *char_to_index.get(&START_END_CHARACTER).unwrap();
         loop {
-            character_index = engram_distribution[character_index].sample(&mut rng);
+            character_index = engram_distribution_model[character_index].sample(&mut rng);
             let character = *index_to_char.get(&character_index).unwrap();
 
             if character == START_END_CHARACTER {
@@ -119,4 +119,6 @@ fn main() {
 
         println!("");
     }
+
+    // Compute how well model performs for given word
 }
